@@ -1,0 +1,20 @@
+/* Styles scoped to the new exercise pages; the shared layout stays in style.css. */
+#main .exercise-body { padding: 0 30px 30px; }
+#registration-form { color: #525252; font-size: 14px; }
+#registration-form fieldset { margin: 0 2px 4px; padding: 10px 12px 0; border: 1px solid #999; }
+#registration-form legend { color: #111; font-size: 16px; }
+#registration-form .form-row { margin: 0 0 34px; }
+#registration-form .form-row > label, #registration-form .field-label { display: block; margin-bottom: 5px; }
+#registration-form input:not([type="checkbox"]):not([type="radio"]):not([type="date"]):not([type="number"]) { width: 170px; box-sizing: border-box; }
+#registration-form input[type="number"] { width: 70px; }
+#registration-form .choices { margin-top: 34px; }
+#registration-form textarea { max-width: 100%; box-sizing: border-box; }
+#registration-form .btn { width: 72px; }
+#registration-form #registration-status { margin-top: 16px; }
+.media-article figure { margin: 18px 0 24px 40px; }
+.media-article figure img { display: block; width: 100%; height: auto; }
+.media-article figcaption { font-size: 14px; color: #222; }
+.media-article video { display: block; width: 550px; max-width: 100%; }
+.media-article audio { max-width: 100%; }
+.media-article iframe { display: block; max-width: 100%; border: 0; }
+#contents .media-article h2 { line-height: 42px; margin: 12px 0 24px; }
