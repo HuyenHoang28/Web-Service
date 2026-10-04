@@ -1,0 +1,160 @@
+:root {
+	color-scheme: dark;
+	font-family: "Segoe UI", Arial, sans-serif;
+	background: #171612;
+	color: #f5efe3;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	min-height: 100vh;
+	margin: 0;
+	background:
+		radial-gradient(circle at 85% 8%, rgba(194, 71, 45, 0.28), transparent 28rem),
+		linear-gradient(145deg, #211f19, #12110f 65%);
+}
+
+.hero {
+	max-width: 1080px;
+	margin: 0 auto;
+	padding: 96px 32px 52px;
+}
+
+.eyebrow,
+.label {
+	margin: 0 0 14px;
+	color: #e7a55c;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+}
+
+h1 {
+	max-width: 760px;
+	margin: 0;
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: clamp(48px, 9vw, 92px);
+	font-weight: 400;
+	line-height: 0.96;
+	letter-spacing: -0.05em;
+}
+
+.intro {
+	max-width: 650px;
+	margin: 28px 0 0;
+	color: #c6bfb3;
+	font-size: 18px;
+	line-height: 1.7;
+}
+
+.exercise-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 20px;
+	max-width: 1080px;
+	margin: 0 auto;
+	padding: 0 32px 80px;
+}
+
+.exercise-card {
+	position: relative;
+	min-height: 390px;
+	padding: 40px;
+	overflow: hidden;
+	background: #f1eadd;
+	color: #24211c;
+	border-radius: 4px;
+}
+
+.exercise-card.accent {
+	background: #c2472d;
+	color: #fff8ee;
+}
+
+.number {
+	position: absolute;
+	top: -34px;
+	right: 18px;
+	color: rgba(36, 33, 28, 0.07);
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 180px;
+	line-height: 1;
+}
+
+.accent .number {
+	color: rgba(255, 255, 255, 0.09);
+}
+
+.exercise-card h2 {
+	position: relative;
+	max-width: 360px;
+	margin: 0 0 18px;
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 38px;
+	font-weight: 400;
+	line-height: 1.1;
+}
+
+.exercise-card > p:not(.label) {
+	position: relative;
+	max-width: 430px;
+	margin: 0;
+	color: #645d52;
+	line-height: 1.65;
+}
+
+.accent > p:not(.label) {
+	color: #f6d9cd;
+}
+
+.exercise-card a {
+	position: absolute;
+	left: 40px;
+	bottom: 40px;
+	color: inherit;
+	font-weight: 700;
+	text-decoration: none;
+	border-bottom: 2px solid currentColor;
+	padding-bottom: 5px;
+}
+
+.exercise-card a:hover,
+.exercise-card a:focus-visible {
+	color: #b43f28;
+}
+
+.accent a:hover,
+.accent a:focus-visible {
+	color: #ffd7a6;
+}
+
+footer {
+	padding: 24px 32px 40px;
+	color: #766f64;
+	text-align: center;
+	font-size: 13px;
+}
+
+@media (max-width: 720px) {
+	.hero {
+		padding-top: 64px;
+	}
+
+	.exercise-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.exercise-card {
+		min-height: 360px;
+		padding: 32px;
+	}
+
+	.exercise-card a {
+		left: 32px;
+		bottom: 32px;
+	}
+}
