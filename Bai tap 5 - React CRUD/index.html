@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>React CRUD - Quản lý người dùng</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f6fa; }
+    h1 { text-align: center; }
+    .toolbar { display: flex; gap: 10px; justify-content: center; margin-bottom: 16px; }
+    input { padding: 6px 8px; border: 1px solid #bbb; border-radius: 4px; }
+    button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; background: #2d7ff9; color: #fff; }
+    button.btn-delete { background: #e74c3c; }
+    button.btn-cancel { background: #888; }
+    table { border-collapse: collapse; width: 100%; background: #fff; }
+    th, td { border: 1px solid #ddd; padding: 8px; font-size: 14px; }
+    th { background: #2d7ff9; color: #fff; }
+    td button { margin-right: 4px; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,.4); display: flex; justify-content: center; align-items: center; z-index: 999; }
+    .modal-content { background: #fff; padding: 16px; border-radius: 6px; width: 320px; }
+    .modal-content div.row { margin-bottom: 8px; display: flex; flex-direction: column; }
+    .modal-content label { font-size: 13px; margin-bottom: 2px; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .empty { text-align: center; color: #777; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const EMPTY_USER = {
+      name: "", username: "", email: "",
+      address: { street: "", suite: "", city: "" },
+      phone: "", website: ""
+    };
+
+    // Form dùng chung cho Thêm và Sửa (controlled components)
+    function UserForm({ title, values, onFieldChange, onSubmit, onCancel, submitText }) {
+      const fields = [
+        ["name", "Name"], ["username", "Username"], ["email", "Email"],
+        ["street", "Street"], ["suite", "Suite"], ["city", "City"],
+        ["phone", "Phone"], ["website", "Website"]
+      ];
+      const getValue = (id) =>
+        ["street", "suite", "city"].includes(id) ? values.address[id] : values[id];
+      return (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h4>{title}</h4>
+            {fields.map(([id, label]) => (
+              <div className="row" key={id}>
+                <label htmlFor={id}>{label}:</label>
+                <input id={id} type="text" value={getValue(id)}
+                  onChange={(e) => onFieldChange(id, e.target.value)} />
+              </div>
+            ))}
+            <div className="modal-actions">
+              <button onClick={onSubmit}>{submitText}</button>
+              <button className="btn-cancel" onClick={onCancel}>Hủy</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Cập nhật 1 trường, xử lý thuộc tính lồng address bằng spread operator
+    function setField(obj, id, value) {
+      if (["street", "suite", "city"].includes(id)) {
+        return { ...obj, address: { ...obj.address, [id]: value } };
+      }
+      return { ...obj, [id]: value };
+    }
+
+    function SearchForm({ onChangeValue }) {
+      return (
+        <input type="text" placeholder="Tìm theo name, username"
+          onChange={(e) => onChangeValue(e.target.value)} />
+      );
+    }
+
+    function AddUser({ onAdd }) {
+      const [adding, setAdding] = React.useState(false);
+      const [user, setUser] = React.useState(EMPTY_USER);
+
+      const handleAdd = () => {
+        if (user.name.trim() === "" || user.username.trim() === "") {
+          alert("Vui lòng nhập Name và Username!");
+          return;
+        }
+        onAdd(user);                // gửi dữ liệu lên App
+        setUser(EMPTY_USER);
+        setAdding(false);
+      };
+
+      return (
+        <div>
+          <button onClick={() => setAdding(true)}>Thêm</button>
+          {adding && (
+            <UserForm title="Thêm người dùng" values={user}
+              onFieldChange={(id, v) => setUser((prev) => setField(prev, id, v))}
+              onSubmit={handleAdd}
+              onCancel={() => setAdding(false)}
+              submitText="Thêm" />
+          )}
+        </div>
+      );
+    }
+
+    function ResultTable({ keyword, user, onAdded }) {
+      const [users, setUsers] = React.useState([]);
+      const [loading, setLoading] = React.useState(true);
+      const [error, setError] = React.useState(null);
+      const [editing, setEditing] = React.useState(null);
+
+      // Tải dữ liệu 1 lần khi mount
+      React.useEffect(() => {
+        fetch("https://jsonplaceholder.typicode.com/users")
+          .then((res) => {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+          })
+          .then((data) => { setUsers(data); setLoading(false); })
+          .catch((err) => { setError(err.message); setLoading(false); });
+      }, []);
+
+      // Nhận user mới từ App -> thêm vào danh sách
+      React.useEffect(() => {
+        if (user) {
+          // id = max + 1 để không trùng sau khi xóa
+          setUsers((prev) => {
+            const nextId = prev.reduce((m, u) => Math.max(m, u.id), 0) + 1;
+            return [...prev, { ...user, id: nextId }];
+          });
+          onAdded();
+        }
+      }, [user]);
+
+      const kw = keyword.toLowerCase();
+      const filteredUsers = users.filter(
+        (u) => u.name.toLowerCase().includes(kw) || u.username.toLowerCase().includes(kw)
+      );
+
+      // Deep copy để sửa không ảnh hưởng dữ liệu gốc trong bảng
+      function editUser(u) { setEditing({ ...u, address: { ...u.address } }); }
+      function handleEditChange(id, value) { setEditing((prev) => setField(prev, id, value)); }
+      function saveUser() {
+        setUsers((prev) => prev.map((u) => (u.id === editing.id ? editing : u)));
+        setEditing(null);
+      }
+      function removeUser(id) { setUsers((prev) => prev.filter((u) => u.id !== id)); }
+
+      if (loading) return <p className="empty">Đang tải dữ liệu...</p>;
+      if (error) return <p className="empty">Lỗi tải dữ liệu: {error}</p>;
+
+      return (
+        <div>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Name</th><th>Username</th><th>Email</th>
+                <th>Address</th><th>Phone</th><th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.length === 0 && (
+                <tr><td colSpan="7" className="empty">Không có kết quả</td></tr>
+              )}
+              {filteredUsers.map((u) => (
+                <tr key={u.id}>
+                  <td>{u.id}</td>
+                  <td>{u.name}</td>
+                  <td>{u.username}</td>
+                  <td>{u.email}</td>
+                  <td>{u.address.street}, {u.address.suite}, {u.address.city}</td>
+                  <td>{u.phone}</td>
+                  <td>
+                    <button onClick={() => editUser(u)}>Sửa</button>
+                    <button className="btn-delete" onClick={() => removeUser(u.id)}>Xóa</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {editing && (
+            <UserForm title="Sửa người dùng" values={editing}
+              onFieldChange={handleEditChange}
+              onSubmit={saveUser}
+              onCancel={() => setEditing(null)}
+              submitText="Lưu" />
+          )}
+        </div>
+      );
+    }
+
+    function App() {
+      const [kw, setKeyword] = React.useState("");
+      const [newUser, setNewUser] = React.useState(null);
+      return (
+        <div>
+          <h1>Quản lý người dùng</h1>
+          <div className="toolbar">
+            <SearchForm onChangeValue={setKeyword} />
+            <AddUser onAdd={setNewUser} />
+          </div>
+          <ResultTable keyword={kw} user={newUser} onAdded={() => setNewUser(null)} />
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>

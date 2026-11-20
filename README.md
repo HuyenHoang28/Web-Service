@@ -7,6 +7,7 @@ Bài tập HTML/CSS với khung bố cục Blakletterpress. Trang chủ hiện l
 - `register.html`: form đăng ký nhận thông tin (bài 3).
 - `media.html`: trang đa phương tiện và semantic HTML5 (bài 4).
 - `index_new.html`: trang chủ cũ được refactor semantic HTML5 (bài 5).
+- `Bai tap 5 - React CRUD/`: ứng dụng React CRUD (index.html) và báo cáo (BAO_CAO.md).
 - `PROMPT.md`: prompt refactor và ghi chú về dữ liệu minh họa.
 
 ## Cloudflare Pages
